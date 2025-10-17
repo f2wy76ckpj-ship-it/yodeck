@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fun Corner 😄</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --accent:#F36C21;
+    --text:#2c3e50;
+    --muted:#666;
+    --card:#f9f9f9;
+    --bg:#ffffff;
+    --cat-fun:#FFF5E6;
+    --cat-eng:#E9F7EF;
+    --cat-joke:#FDEDEC;
+    --cat-trivia:#EBF5FB;
+    --cat-history:#F4ECF7;
+  }
+  html,body{height:100%}
+  body{
+    margin:0; padding:56px 20px;
+    font-family: Khula, Arial, sans-serif;
+    background:var(--bg); color:var(--text);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  }
+  h1{
+    color:var(--accent);
+    font-size:2.1rem; margin:0 0 28px 0; text-align:center;
+  }
+  .card{
+    width:min(1000px, 92vw);
+    min-height:170px;
+    background:var(--card);
+    border-radius:22px;
+    box-shadow:0 6px 14px rgba(0,0,0,0.08);
+    padding:42px 28px;
+    font-size:1.7rem; line-height:1.45;
+    text-align:center;
+    transition:opacity 0.8s ease-in-out, transform 0.4s ease;
+  }
+  .card.fade{opacity:0}
+  .pill{display:inline-block; padding:6px 12px; border-radius:999px; font-size:0.95rem; margin-top:16px; color:#333}
+  .pill.fun{background:var(--cat-fun)}
+  .pill.eng{background:var(--cat-eng)}
+  .pill.joke{background:var(--cat-joke)}
+  .pill.trivia{background:var(--cat-trivia)}
+  .pill.history{background:var(--cat-history)}
+  .footer{
+    margin-top:22px; font-size:0.9rem; color:var(--muted);
+  }
+</style>
+</head>
+<body>
+  <h1>🎉 Fun Corner</h1>
+  <div class="card" id="card">Loading fun...</div>
+  <div class="pill" id="pill">...</div>
+  <div class="footer" id="footer"></div>
+
+<script>
+const FUN_FACTS = [
+  "Honey never spoils. Archaeologists found pots in ancient Egyptian tombs that are still edible.",
+  "Bananas are berries, but strawberries are not.",
+  "Octopuses have three hearts and blue blood.",
+  "The Eiffel Tower can grow about 15 cm in hot weather due to thermal expansion.",
+  "A day on Venus is longer than a year on Venus.",
+  "There are more stars in the universe than grains of sand on all Earth’s beaches.",
+  "Humans share ~60% of their DNA with bananas.",
+  "Hot water can freeze faster than cold water – it’s called the Mpemba effect.",
+  "Wombat poop is cube-shaped.",
+  "Sharks existed before trees."
+];
+
+const ENGINEERING = [
+  "Concrete is the most-used material on Earth after water.",
+  "Rebar revolutionized concrete’s tensile strength, enabling modern bridges and towers.",
+  "The Hong Kong–Zhuhai–Macau Bridge spans 55 km across the sea.",
+  "TBMs can exceed 15 meters in diameter—large enough for a two-lane road.",
+  "Cable-stayed bridges use straight cables radiating from towers.",
+  "Asphalt is recyclable and used again in many modern roads.",
+  "Wind causes vortex shedding on tall chimneys—helical strakes fix that.",
+  "Base isolation allows buildings to ‘float’ during earthquakes.",
+  "Self-healing concrete seals cracks with bacteria.",
+  "Modern viaducts often use segmental construction with precast segments."
+];
+
+const JOKES = [
+  "Why did the computer show up late? It had a hard drive!",
+  "I told my Wi‑Fi we needed to talk… now we’re not connecting.",
+  "Why did the engineer cross the road? To optimize the crossing time.",
+  "I would tell you a construction pun… but I’m still working on it.",
+  "How many programmers does it take to change a light bulb? None—it’s a hardware problem.",
+  "I have a great joke about asphalt… but it’s a bit too laid back.",
+  "The bridge and I had tension issues… we needed more support.",
+  "Why don’t skeletons fight each other? They don’t have the guts.",
+  "I tried to catch fog yesterday. Mist.",
+  "I told the hammer to chill. It nailed it."
+];
+
+const TRIVIA = [
+  "What is the largest man‑made structure by volume? — The Boeing Everett Factory (~13.3 million m³).",
+  "Which bridge has the longest main span? — Akashi Kaikyō Bridge (1991 m).",
+  "What is the hardest natural material? — Diamond.",
+  "Which country has the most islands? — Sweden (260,000+).",
+  "What’s the deepest ocean trench? — Mariana Trench (~11,000 m).",
+  "What’s the tallest building as of 2025? — Burj Khalifa (828 m).",
+  "Which city is known as ‘The Eternal City’? — Rome.",
+  "What element has the chemical symbol ‘W’? — Tungsten (Wolfram).",
+  "What’s the longest railway tunnel? — Gotthard Base Tunnel (57 km).",
+  "Which planet has the most moons? — Saturn."
+];
+
+const HISTORY = [
+  "1969: The first ARPANET message was sent from UCLA — the Internet was born.",
+  "1889: The Eiffel Tower opened to the public in Paris.",
+  "1914: The first commercial asphalt road was laid in the US.",
+  "1937: The Golden Gate Bridge opened, redefining long-span bridges.",
+  "1959: Jack Kilby demonstrated the first microchip at Texas Instruments.",
+  "1964: Japan’s Shinkansen bullet trains began operation.",
+  "1998: The Akashi Kaikyō Bridge opened, a record main span length.",
+  "2016: The Gotthard Base Tunnel opened — world’s longest traffic tunnel.",
+  "1991: The World Wide Web became public.",
+  "1903: The Wright brothers achieved the first powered flight."
+];
+
+function wrap(list, cat, cls){ return list.map(t => ({ text:t, cat, cls })); }
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+let ITEMS = [
+  ...wrap(FUN_FACTS, "Fun Fact", "fun"),
+  ...wrap(ENGINEERING, "Engineering Fact", "eng"),
+  ...wrap(JOKES, "Joke of the Day", "joke"),
+  ...wrap(TRIVIA, "Trivia", "trivia"),
+  ...wrap(HISTORY, "This Day in History", "history"),
+];
+ITEMS = shuffle(ITEMS);
+
+let idx = 0;
+const card = document.getElementById('card');
+const pill = document.getElementById('pill');
+const footer = document.getElementById('footer');
+
+function nextItem(){
+  card.classList.add('fade');
+  setTimeout(() => {
+    const it = ITEMS[idx];
+    card.textContent = it.text;
+    pill.textContent = it.cat;
+    pill.className = 'pill ' + it.cls;
+    footer.textContent = new Date().toLocaleString('en-GB', { weekday:'short', hour:'2-digit', minute:'2-digit' });
+    card.classList.remove('fade');
+    idx = (idx + 1) % ITEMS.length;
+    if(idx === 0) ITEMS = shuffle(ITEMS);
+  }, 800);
+}
+nextItem();
+setInterval(nextItem, 10000);
+</script>
+</body>
+</html>
