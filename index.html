@@ -25,8 +25,8 @@
 
   h1{
     color:var(--accent);
-    font-size:1.9rem;
-    margin:4px 0 6px 0;
+    font-size:32px; /* čitljiv s daljine */
+    margin:6px 0 8px 0;
     text-align:center;
   }
 
@@ -34,9 +34,9 @@
     width:94%;
     height:72%;
     background:var(--card);
-    border-radius:20px;
-    box-shadow:0 4px 8px rgba(0,0,0,.08);
-    padding:12px 18px;
+    border-radius:18px;
+    box-shadow:0 3px 6px rgba(0,0,0,.08);
+    padding:14px 18px;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -48,8 +48,8 @@
   .card.fade{opacity:0}
 
   #fact{
-    font-size:1.6rem;
-    line-height:1.25;
+    font-size:32px;     /* velika početna veličina */
+    line-height:1.2;
     max-width:95%;
     word-wrap:break-word;
     flex-grow:1;
@@ -58,14 +58,14 @@
     justify-content:center;
     padding:0 8px;
     text-align:center;
-    transition:font-size .2s ease;
+    transition:font-size .3s ease;
   }
 
   .pill{
     display:inline-block;
-    padding:6px 16px;
+    padding:5px 16px;
     border-radius:999px;
-    font-size:1rem;
+    font-size:18px;
     margin-top:10px;
     color:#333;
     white-space:nowrap;
@@ -76,12 +76,6 @@
   .pill.joke{background:var(--cat-joke)}
   .pill.trivia{background:var(--cat-trivia)}
   .pill.history{background:var(--cat-history)}
-
-  @media (min-width:900px){
-    #fact{font-size:1.8rem;}
-    h1{font-size:2rem;}
-    .pill{font-size:1.1rem;}
-  }
 </style>
 </head>
 <body>
@@ -215,7 +209,7 @@ const START_HIST = [
   "2012 — Curiosity rover lands on Mars."
 ];
   
-async function start(){
+  async function start(){
   const fact=document.getElementById("fact");
   const pill=document.getElementById("pill");
   const [fun,eng,joke,trivia,hist]=await Promise.all([
@@ -231,9 +225,9 @@ async function start(){
 
   function adjustFont(){
     const el=fact;
-    el.style.fontSize="1.6rem";
-    while(el.scrollHeight>el.clientHeight && parseFloat(el.style.fontSize)>0.8){
-      el.style.fontSize=(parseFloat(el.style.fontSize)-0.05)+"rem";
+    el.style.fontSize="32px";
+    while(el.scrollHeight>el.clientHeight && parseFloat(el.style.fontSize)>18){
+      el.style.fontSize=(parseFloat(el.style.fontSize)-1)+"px";
     }
   }
 
