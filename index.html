@@ -1,160 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Fun Corner 😄</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<title>Fun Corner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
   :root{
-    --accent:#F36C21;
-    --text:#2c3e50;
-    --muted:#666;
-    --card:#f9f9f9;
-    --bg:#ffffff;
-    --cat-fun:#FFF5E6;
-    --cat-eng:#E9F7EF;
-    --cat-joke:#FDEDEC;
-    --cat-trivia:#EBF5FB;
-    --cat-history:#F4ECF7;
+    --accent:#F36C21; --text:#2c3e50; --card:#f9f9f9; --bg:#ffffff;
+    --cat-fun:#FFF5E6; --cat-eng:#E9F7EF; --cat-joke:#FDEDEC; --cat-trivia:#EBF5FB; --cat-history:#F4ECF7;
   }
   html,body{height:100%}
-  body{
-    margin:0; padding:56px 20px;
-    font-family: Khula, Arial, sans-serif;
-    background:var(--bg); color:var(--text);
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-  }
-  h1{
-    color:var(--accent);
-    font-size:2.1rem; margin:0 0 28px 0; text-align:center;
-  }
-  .card{
-    width:min(1000px, 92vw);
-    min-height:170px;
-    background:var(--card);
-    border-radius:22px;
-    box-shadow:0 6px 14px rgba(0,0,0,0.08);
-    padding:42px 28px;
-    font-size:1.7rem; line-height:1.45;
-    text-align:center;
-    transition:opacity 0.8s ease-in-out, transform 0.4s ease;
-  }
+  body{margin:0;padding:56px 20px;font-family:Arial, sans-serif;background:var(--bg);color:var(--text);
+       display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+  h1{color:var(--accent);font-size:2.1rem;margin:0 0 28px;text-align:center}
+  .card{width:min(1000px,92vw);min-height:170px;background:var(--card);
+        border-radius:22px;box-shadow:0 6px 14px rgba(0,0,0,.08);
+        padding:42px 28px;font-size:1.6rem;line-height:1.45;text-align:center;
+        transition:opacity .8s ease-in-out}
   .card.fade{opacity:0}
-  .pill{display:inline-block; padding:6px 12px; border-radius:999px; font-size:0.95rem; margin-top:16px; color:#333}
-  .pill.fun{background:var(--cat-fun)}
-  .pill.eng{background:var(--cat-eng)}
-  .pill.joke{background:var(--cat-joke)}
-  .pill.trivia{background:var(--cat-trivia)}
+  .pill{display:inline-block;padding:6px 12px;border-radius:999px;font-size:.95rem;margin-top:16px;color:#333}
+  .pill.fun{background:var(--cat-fun)} .pill.eng{background:var(--cat-eng)}
+  .pill.joke{background:var(--cat-joke)} .pill.trivia{background:var(--cat-trivia)}
   .pill.history{background:var(--cat-history)}
-  .footer{
-    margin-top:22px; font-size:0.9rem; color:var(--muted);
-  }
 </style>
 </head>
 <body>
   <h1>🎉 Fun Corner</h1>
-  <div class="card" id="card">Loading fun...</div>
-  <div class="pill" id="pill">...</div>
-  <div class="footer" id="footer"></div>
+  <div class="card" id="card">Loading…</div>
+  <div class="pill" id="pill">…</div>
 
 <script>
-const FUN_FACTS = [
-  "Honey never spoils. Archaeologists found pots in ancient Egyptian tombs that are still edible.",
+/* ---------- Helpers ---------- */
+const repoBase = "https://f2wy76ckpj-ship-it.github.io/yodeck"; // tvoj GitHub Pages root
+async function loadList(url){
+  try{
+    const r = await fetch(url, {cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const json = await r.json();
+    return Array.isArray(json) ? json.filter(x=>typeof x==="string"&&x.trim()) : [];
+  }catch(e){ return []; }
+}
+function wrap(list,cat,cls){ return list.map(t=>({text:t,cat,cls})); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ---------- Built-in starters (radi odmah) ---------- */
+const START_FUN = [
+  "Honey never spoils—even 3000-year-old Egyptian honey is edible!",
   "Bananas are berries, but strawberries are not.",
   "Octopuses have three hearts and blue blood.",
-  "The Eiffel Tower can grow about 15 cm in hot weather due to thermal expansion.",
   "A day on Venus is longer than a year on Venus.",
-  "There are more stars in the universe than grains of sand on all Earth’s beaches.",
-  "Humans share ~60% of their DNA with bananas.",
-  "Hot water can freeze faster than cold water – it’s called the Mpemba effect.",
   "Wombat poop is cube-shaped.",
-  "Sharks existed before trees."
+  "Sharks existed before trees.",
+  "Hot water can freeze faster than cold—the Mpemba effect.",
+  "There are more stars than grains of sand on Earth’s beaches.",
+  "The Eiffel Tower grows ~15 cm in summer heat.",
+  "Humans share ~60% of DNA with bananas!",
+  "Butterflies taste with their feet.",
+  "Koalas have fingerprints similar to humans.",
+  "Sea otters hold hands while sleeping to avoid drifting apart.",
+  "Sloths can hold their breath longer than dolphins.",
+  "An ostrich’s eye is bigger than its brain.",
+  "Cats can be allergic to humans.",
+  "Cows have best friends and get stressed when separated.",
+  "A snail can sleep for three years.",
+  "Some turtles breathe through their rear ends.",
+  "Your brain makes ~20 watts of power."
 ];
-
-const ENGINEERING = [
+const START_ENG = [
   "Concrete is the most-used material on Earth after water.",
-  "Rebar revolutionized concrete’s tensile strength, enabling modern bridges and towers.",
-  "The Hong Kong–Zhuhai–Macau Bridge spans 55 km across the sea.",
-  "TBMs can exceed 15 meters in diameter—large enough for a two-lane road.",
-  "Cable-stayed bridges use straight cables radiating from towers.",
-  "Asphalt is recyclable and used again in many modern roads.",
-  "Wind causes vortex shedding on tall chimneys—helical strakes fix that.",
-  "Base isolation allows buildings to ‘float’ during earthquakes.",
+  "Rebar revolutionized modern construction.",
+  "The Hong Kong–Zhuhai–Macau Bridge spans ~55 km.",
+  "TBMs can exceed 15 m diameter—enough for a two-lane road.",
+  "Base isolation lets buildings ‘float’ during earthquakes.",
   "Self-healing concrete seals cracks with bacteria.",
-  "Modern viaducts often use segmental construction with precast segments."
+  "Wind vortices on chimneys are fixed with helical strakes.",
+  "Segmental construction enables fast viaduct assembly.",
+  "Asphalt is recyclable and widely reused.",
+  "Cable-stayed bridges use straight cables radiating from towers.",
+  "Burj Khalifa used ~330,000 m³ of concrete.",
+  "3D-printed houses already exist in pilot projects.",
+  "The Panama Canal operates mostly by gravity.",
+  "Most structural steel is recycled.",
+  "Modern wind turbines can reach 260 m height.",
+  "Soil freezing can stabilize ground for tunneling.",
+  "Launching girders lift precast viaduct segments.",
+  "High-performance concrete can exceed 100 MPa strength.",
+  "Dampers tame sway in tall buildings.",
+  "Geogrids reinforce soil in road embankments."
 ];
-
-const JOKES = [
+const START_JOKE = [
   "Why did the computer show up late? It had a hard drive!",
-  "I told my Wi‑Fi we needed to talk… now we’re not connecting.",
+  "I’d tell you a construction pun… but I’m still working on it.",
   "Why did the engineer cross the road? To optimize the crossing time.",
-  "I would tell you a construction pun… but I’m still working on it.",
-  "How many programmers does it take to change a light bulb? None—it’s a hardware problem.",
-  "I have a great joke about asphalt… but it’s a bit too laid back.",
+  "How many programmers to change a bulb? None—hardware issue!",
+  "I told the hammer to relax. It nailed it.",
   "The bridge and I had tension issues… we needed more support.",
-  "Why don’t skeletons fight each other? They don’t have the guts.",
   "I tried to catch fog yesterday. Mist.",
-  "I told the hammer to chill. It nailed it."
+  "Why don’t skeletons fight? They don’t have the guts.",
+  "I have a joke about asphalt… but it’s a bit laid back.",
+  "Parallel lines have so much in common—it’s a shame they’ll never meet.",
+  "Never trust atoms—they make up everything.",
+  "My math teacher called me average. How mean!",
+  "I used to be a banker… I lost interest.",
+  "Debugging: you are the detective and the culprit.",
+  "I told a chemistry joke… no reaction.",
+  "I need a vacation—my cache is full.",
+  "404: Joke not found.",
+  "There are 10 kinds of people: those who understand binary and those who don’t.",
+  "Wi-Fi went down at home… now we talk to each other. Weird people live here!",
+  "Real engineers count from zero."
+];
+const START_TRIVIA = [
+  "Largest building by volume — Boeing Everett Factory (~13 million m³).",
+  "Longest bridge main span — Akashi Kaikyō (1991 m).",
+  "Tallest building (2025) — Burj Khalifa, 828 m.",
+  "Country with most islands — Sweden (260,000+).",
+  "Deepest trench — Mariana (~11,000 m).",
+  "Element with symbol W — Tungsten (Wolfram).",
+  "Longest rail tunnel — Gotthard Base, 57 km.",
+  "Planet with most moons — Saturn.",
+  "Hardest natural material — Diamond.",
+  "‘The Eternal City’ — Rome.",
+  "Largest desert — Antarctica.",
+  "Everest grows ~4 mm per year.",
+  "Venus spins clockwise.",
+  "Giza’s Great Pyramid was tallest for ~3,800 years.",
+  "Lightning is ~5× hotter than the sun’s surface.",
+  "Most snowflakes have six sides.",
+  "~70% of Earth is water.",
+  "Humans & giraffes have same number of neck vertebrae.",
+  "Amazon River has no bridges over its main course.",
+  "A lightning bolt can power a 100-W bulb for months."
+];
+const START_HIST = [
+  "1903 — Wright brothers’ first powered flight.",
+  "1937 — Golden Gate Bridge opens.",
+  "1959 — First microchip by Jack Kilby.",
+  "1964 — Japan’s Shinkansen debuts.",
+  "1969 — First ARPANET message (proto-Internet).",
+  "1989 — The Web conceived by Tim Berners-Lee.",
+  "1998 — Akashi Kaikyō Bridge sets span record.",
+  "2016 — Gotthard Base Tunnel opens (57 km).",
+  "1889 — Eiffel Tower opens.",
+  "1914 — First commercial asphalt road in the US.",
+  "1825 — First public railway opens in England.",
+  "1879 — Edison patents practical light bulb.",
+  "1901 — First transatlantic radio signal.",
+  "1913 — Ford’s moving assembly line.",
+  "1957 — Sputnik 1 becomes first satellite.",
+  "1961 — Yuri Gagarin: first human in space.",
+  "1981 — IBM PC launches.",
+  "1990 — Hubble Space Telescope launched.",
+  "2004 — Facebook founded.",
+  "2012 — Curiosity rover lands on Mars."
 ];
 
-const TRIVIA = [
-  "What is the largest man‑made structure by volume? — The Boeing Everett Factory (~13.3 million m³).",
-  "Which bridge has the longest main span? — Akashi Kaikyō Bridge (1991 m).",
-  "What is the hardest natural material? — Diamond.",
-  "Which country has the most islands? — Sweden (260,000+).",
-  "What’s the deepest ocean trench? — Mariana Trench (~11,000 m).",
-  "What’s the tallest building as of 2025? — Burj Khalifa (828 m).",
-  "Which city is known as ‘The Eternal City’? — Rome.",
-  "What element has the chemical symbol ‘W’? — Tungsten (Wolfram).",
-  "What’s the longest railway tunnel? — Gotthard Base Tunnel (57 km).",
-  "Which planet has the most moons? — Saturn."
-];
+/* ---------- App ---------- */
+async function start(){
+  const card = document.getElementById("card");
+  const pill = document.getElementById("pill");
 
-const HISTORY = [
-  "1969: The first ARPANET message was sent from UCLA — the Internet was born.",
-  "1889: The Eiffel Tower opened to the public in Paris.",
-  "1914: The first commercial asphalt road was laid in the US.",
-  "1937: The Golden Gate Bridge opened, redefining long-span bridges.",
-  "1959: Jack Kilby demonstrated the first microchip at Texas Instruments.",
-  "1964: Japan’s Shinkansen bullet trains began operation.",
-  "1998: The Akashi Kaikyō Bridge opened, a record main span length.",
-  "2016: The Gotthard Base Tunnel opened — world’s longest traffic tunnel.",
-  "1991: The World Wide Web became public.",
-  "1903: The Wright brothers achieved the first powered flight."
-];
+  // Try to load remote JSONs; if not found, use starters
+  const [fun, eng, joke, trivia, hist] = await Promise.all([
+    loadList(repoBase + "/fun.json").then(a=>a.length?a:START_FUN),
+    loadList(repoBase + "/engineering.json").then(a=>a.length?a:START_ENG),
+    loadList(repoBase + "/jokes.json").then(a=>a.length?a:START_JOKE),
+    loadList(repoBase + "/trivia.json").then(a=>a.length?a:START_TRIVIA),
+    loadList(repoBase + "/history.json").then(a=>a.length?a:START_HIST),
+  ]);
 
-function wrap(list, cat, cls){ return list.map(t => ({ text:t, cat, cls })); }
-function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+  let ITEMS = [
+    ...wrap(fun, "Fun Fact", "fun"),
+    ...wrap(eng, "Engineering Fact", "eng"),
+    ...wrap(joke, "Joke", "joke"),
+    ...wrap(trivia, "Trivia", "trivia"),
+    ...wrap(hist, "This Day in History", "history")
+  ];
+  shuffle(ITEMS);
 
-let ITEMS = [
-  ...wrap(FUN_FACTS, "Fun Fact", "fun"),
-  ...wrap(ENGINEERING, "Engineering Fact", "eng"),
-  ...wrap(JOKES, "Joke of the Day", "joke"),
-  ...wrap(TRIVIA, "Trivia", "trivia"),
-  ...wrap(HISTORY, "This Day in History", "history"),
-];
-ITEMS = shuffle(ITEMS);
-
-let idx = 0;
-const card = document.getElementById('card');
-const pill = document.getElementById('pill');
-const footer = document.getElementById('footer');
-
-function nextItem(){
-  card.classList.add('fade');
-  setTimeout(() => {
-    const it = ITEMS[idx];
-    card.textContent = it.text;
-    pill.textContent = it.cat;
-    pill.className = 'pill ' + it.cls;
-    footer.textContent = new Date().toLocaleString('en-GB', { weekday:'short', hour:'2-digit', minute:'2-digit' });
-    card.classList.remove('fade');
-    idx = (idx + 1) % ITEMS.length;
-    if(idx === 0) ITEMS = shuffle(ITEMS);
-  }, 800);
+  let idx = 0;
+  function next(){
+    card.classList.add("fade");
+    setTimeout(()=>{
+      const it = ITEMS[idx];
+      card.textContent = it.text;
+      pill.textContent = it.cat;
+      pill.className = "pill " + it.cls;
+      card.classList.remove("fade");
+      idx = (idx + 1) % ITEMS.length;
+      if(idx === 0) shuffle(ITEMS);
+    }, 600);
+  }
+  next();
+  setInterval(next, 10000);
 }
-nextItem();
-setInterval(nextItem, 10000);
+start();
 </script>
 </body>
 </html>
