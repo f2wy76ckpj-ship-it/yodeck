@@ -3,58 +3,68 @@
 <head>
 <meta charset="UTF-8" />
 <title>Fun Corner</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="viewport" content="width=662, height=317, initial-scale=1.0, maximum-scale=1.0" />
 <style>
   :root{
-    --accent:#F36C21; --text:#2c3e50; --card:#f9f9f9; --bg:#ffffff;
+    --accent:#F36C21; --text:#2c3e50; --card:#fffefc; --bg:#ffffff;
     --cat-fun:#FFF5E6; --cat-eng:#E9F7EF; --cat-joke:#FDEDEC; --cat-trivia:#EBF5FB; --cat-history:#F4ECF7;
   }
 
   html,body{
-    height:100%;
-    width:100%;
-    margin:0;
-    padding:0;
+    width:662px; height:317px;
+    margin:0; padding:0;
     background:var(--bg);
-    font-family:Arial, sans-serif;
+    font-family:Khula, Arial, sans-serif;
     color:var(--text);
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:flex-start;
+    justify-content:center;
     overflow:hidden;
   }
 
   h1{
     color:var(--accent);
-    font-size:1.4rem;
-    margin:10px 0 14px 0;
+    font-size:1.2rem;
+    margin:4px 0 6px 0;
     text-align:center;
   }
 
   .card{
-    width:92vw;
-    flex:1;
+    width:94%;
+    height:75%;
     background:var(--card);
-    border-radius:18px;
-    box-shadow:0 4px 10px rgba(0,0,0,.08);
-    padding:20px 14px;
+    border-radius:16px;
+    box-shadow:0 3px 6px rgba(0,0,0,.08);
+    padding:10px 14px;
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:space-between; /* ⬅ rubrika dolje */
+    justify-content:space-between;
     text-align:center;
     transition:opacity .8s ease-in-out;
   }
 
   .card.fade{opacity:0}
 
+  #fact{
+    font-size:0.95rem;
+    line-height:1.25;
+    max-width:95%;
+    word-wrap:break-word;
+    flex-grow:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 5px;
+  }
+
   .pill{
     display:inline-block;
-    padding:4px 10px;
+    padding:3px 10px;
     border-radius:999px;
-    font-size:.75rem;
-    margin-top:12px;
+    font-size:.7rem;
+    margin-top:8px;
     color:#333;
     white-space:nowrap;
   }
@@ -65,21 +75,10 @@
   .pill.trivia{background:var(--cat-trivia)}
   .pill.history{background:var(--cat-history)}
 
-  #fact{
-    font-size:1rem;
-    line-height:1.35;
-    max-width:90%;
-    word-wrap:break-word;
-    flex-grow:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  @media (min-width:600px){
-    h1{font-size:1.8rem;}
-    #fact{font-size:1.4rem;}
-    .pill{font-size:.9rem;}
+  /* prilagodba većim ekranima (ako se slučajno širi) */
+  @media (min-width:800px){
+    h1{font-size:1.5rem;}
+    #fact{font-size:1.2rem;}
   }
 </style>
 </head>
@@ -224,25 +223,24 @@ async function start(){
     loadList(repoBase+"/trivia.json").then(a=>a.length?a:START_TRIVIA),
     loadList(repoBase+"/history.json").then(a=>a.length?a:START_HIST)
   ]);
-  let items=[...wrap(fun,"Fun Fact","fun"),...wrap(eng,"Engineering Fact","eng"),
-             ...wrap(joke,"Joke","joke"),...wrap(trivia,"Trivia","trivia"),
-             ...wrap(hist,"This Day in History","history")];
+  let items=[...wrap(fun,"Fun Fact","fun"),...wrap(eng,"Engineering Fact","eng"),...wrap(joke,"Joke","joke"),...wrap(trivia,"Trivia","trivia"),...wrap(hist,"This Day in History","history")];
   shuffle(items);
   let i=0;
   function next(){
-    fact.parentElement.classList.add("fade");
+    const card=document.getElementById("card");
+    card.classList.add("fade");
     setTimeout(()=>{
       const it=items[i];
       pill.textContent=it.cat;
       pill.className="pill "+it.cls;
       fact.textContent=it.text;
-      fact.parentElement.classList.remove("fade");
+      card.classList.remove("fade");
       i=(i+1)%items.length;
       if(i===0)shuffle(items);
-    },600);
+    },500);
   }
   next();
-  setInterval(next,10000);
+  setInterval(next,9000);
 }
 start();
 </script>
