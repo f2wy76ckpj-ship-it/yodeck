@@ -219,7 +219,7 @@ const START_HIST = [
     loadList(repoBase+"/trivia.json").then(a=>a.length?a:START_TRIVIA),
     loadList(repoBase+"/history.json").then(a=>a.length?a:START_HIST)
   ]);
-  let items=[...wrap(fun,"Fun Fact","fun"),...wrap(eng,"Engineering Fact","eng"),...wrap(joke,"Joke","joke"),...wrap(trivia,"Trivia","trivia"),...wrap(hist,"This Day in History","history")];
+  let items=[...wrap(fun,"Fun Fact","fun"),...wrap(eng,"Engineering Fact","eng"),...wrap(joke,"Joke","joke"),...wrap(trivia,"Trivia","trivia"),...wrap(hist,"History trivia","history")];
   shuffle(items);
   let i=0;
 
