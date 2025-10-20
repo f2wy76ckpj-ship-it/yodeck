@@ -3,84 +3,106 @@
 <head>
 <meta charset="UTF-8" />
 <title>Fun Corner</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <style>
   :root{
     --accent:#F36C21; --text:#2c3e50; --card:#f9f9f9; --bg:#ffffff;
     --cat-fun:#FFF5E6; --cat-eng:#E9F7EF; --cat-joke:#FDEDEC; --cat-trivia:#EBF5FB; --cat-history:#F4ECF7;
   }
-  html,body{height:100%}
-  body{
+
+  html,body{
+    height:100%;
+    width:100%;
     margin:0;
-    padding:56px 20px;
-    font-family:Arial, sans-serif;
+    padding:0;
     background:var(--bg);
+    font-family:Arial, sans-serif;
     color:var(--text);
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
+    overflow:hidden;
   }
+
   h1{
     color:var(--accent);
-    font-size:2.1rem;
-    margin:0 0 28px;
+    font-size:1.4rem;
+    margin:10px 0 14px 0;
     text-align:center;
   }
+
   .card{
-    width:min(1000px,92vw);
-    min-height:200px;
+    width:92vw;
+    flex:1;
     background:var(--card);
-    border-radius:22px;
-    box-shadow:0 6px 14px rgba(0,0,0,.08);
-    padding:42px 28px;
-    font-size:1.6rem;
-    line-height:1.45;
-    text-align:center;
-    transition:opacity .8s ease-in-out;
+    border-radius:18px;
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+    padding:20px 14px;
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:center;
+    justify-content:space-between; /* ⬅ rubrika dolje */
+    text-align:center;
+    transition:opacity .8s ease-in-out;
   }
+
   .card.fade{opacity:0}
+
   .pill{
     display:inline-block;
-    padding:6px 12px;
+    padding:4px 10px;
     border-radius:999px;
-    font-size:.95rem;
-    margin-bottom:18px; /* ⬅ pomaknuto iznad teksta */
+    font-size:.75rem;
+    margin-top:12px;
     color:#333;
+    white-space:nowrap;
   }
+
   .pill.fun{background:var(--cat-fun)}
   .pill.eng{background:var(--cat-eng)}
   .pill.joke{background:var(--cat-joke)}
   .pill.trivia{background:var(--cat-trivia)}
   .pill.history{background:var(--cat-history)}
+
+  #fact{
+    font-size:1rem;
+    line-height:1.35;
+    max-width:90%;
+    word-wrap:break-word;
+    flex-grow:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  @media (min-width:600px){
+    h1{font-size:1.8rem;}
+    #fact{font-size:1.4rem;}
+    .pill{font-size:.9rem;}
+  }
 </style>
 </head>
 <body>
   <h1>🎉 Fun Corner</h1>
   <div class="card" id="card">
-    <div class="pill" id="pill">Loading…</div>
-    <div id="fact">Please wait</div>
+    <div id="fact">Loading…</div>
+    <div class="pill" id="pill">Please wait</div>
   </div>
 
 <script>
-/* ---------- Helpers ---------- */
-const repoBase = "https://f2wy76ckpj-ship-it.github.io/yodeck"; // tvoj GitHub Pages root
+const repoBase = "https://f2wy76ckpj-ship-it.github.io/yodeck";
 async function loadList(url){
   try{
-    const r = await fetch(url, {cache:"no-store"});
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    const json = await r.json();
-    return Array.isArray(json) ? json.filter(x=>typeof x==="string"&&x.trim()) : [];
-  }catch(e){ return []; }
+    const r = await fetch(url,{cache:"no-store"});
+    if(!r.ok)throw new Error();
+    const j = await r.json();
+    return Array.isArray(j)?j.filter(x=>typeof x==="string"&&x.trim()):[];
+  }catch{return[]}
 }
-function wrap(list,cat,cls){ return list.map(t=>({text:t,cat,cls})); }
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function wrap(list,cat,cls){return list.map(t=>({text:t,cat,cls}))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
 
-/* ---------- Built-in starters ---------- */
 const START_FUN = [
   "Honey never spoils—even 3000-year-old Egyptian honey is edible!",
   "Bananas are berries, but strawberries are not.",
@@ -192,43 +214,35 @@ const START_HIST = [
   "2012 — Curiosity rover lands on Mars."
 ];
 
-/* ---------- App ---------- */
 async function start(){
-  const fact = document.getElementById("fact");
-  const pill = document.getElementById("pill");
-
-  const [fun, eng, joke, trivia, hist] = await Promise.all([
-    loadList(repoBase + "/fun.json").then(a=>a.length?a:START_FUN),
-    loadList(repoBase + "/engineering.json").then(a=>a.length?a:START_ENG),
-    loadList(repoBase + "/jokes.json").then(a=>a.length?a:START_JOKE),
-    loadList(repoBase + "/trivia.json").then(a=>a.length?a:START_TRIVIA),
-    loadList(repoBase + "/history.json").then(a=>a.length?a:START_HIST)
+  const fact=document.getElementById("fact");
+  const pill=document.getElementById("pill");
+  const [fun,eng,joke,trivia,hist]=await Promise.all([
+    loadList(repoBase+"/fun.json").then(a=>a.length?a:START_FUN),
+    loadList(repoBase+"/engineering.json").then(a=>a.length?a:START_ENG),
+    loadList(repoBase+"/jokes.json").then(a=>a.length?a:START_JOKE),
+    loadList(repoBase+"/trivia.json").then(a=>a.length?a:START_TRIVIA),
+    loadList(repoBase+"/history.json").then(a=>a.length?a:START_HIST)
   ]);
-
-  let ITEMS = [
-    ...wrap(fun, "Fun Fact", "fun"),
-    ...wrap(eng, "Engineering Fact", "eng"),
-    ...wrap(joke, "Joke", "joke"),
-    ...wrap(trivia, "Trivia", "trivia"),
-    ...wrap(hist, "This Day in History", "history")
-  ];
-  shuffle(ITEMS);
-
-  let idx = 0;
+  let items=[...wrap(fun,"Fun Fact","fun"),...wrap(eng,"Engineering Fact","eng"),
+             ...wrap(joke,"Joke","joke"),...wrap(trivia,"Trivia","trivia"),
+             ...wrap(hist,"This Day in History","history")];
+  shuffle(items);
+  let i=0;
   function next(){
     fact.parentElement.classList.add("fade");
     setTimeout(()=>{
-      const it = ITEMS[idx];
-      pill.textContent = it.cat;
-      pill.className = "pill " + it.cls;
-      fact.textContent = it.text;
+      const it=items[i];
+      pill.textContent=it.cat;
+      pill.className="pill "+it.cls;
+      fact.textContent=it.text;
       fact.parentElement.classList.remove("fade");
-      idx = (idx + 1) % ITEMS.length;
-      if(idx === 0) shuffle(ITEMS);
-    }, 600);
+      i=(i+1)%items.length;
+      if(i===0)shuffle(items);
+    },600);
   }
   next();
-  setInterval(next, 10000);
+  setInterval(next,10000);
 }
 start();
 </script>
