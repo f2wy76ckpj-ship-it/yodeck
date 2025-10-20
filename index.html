@@ -25,18 +25,18 @@
 
   h1{
     color:var(--accent);
-    font-size:1.6rem;
-    margin:6px 0 8px 0;
+    font-size:1.9rem;
+    margin:4px 0 6px 0;
     text-align:center;
   }
 
   .card{
     width:94%;
-    height:74%;
+    height:72%;
     background:var(--card);
-    border-radius:18px;
-    box-shadow:0 3px 6px rgba(0,0,0,.08);
-    padding:12px 16px;
+    border-radius:20px;
+    box-shadow:0 4px 8px rgba(0,0,0,.08);
+    padding:12px 18px;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -48,8 +48,8 @@
   .card.fade{opacity:0}
 
   #fact{
-    font-size:1.25rem;
-    line-height:1.35;
+    font-size:1.6rem;
+    line-height:1.25;
     max-width:95%;
     word-wrap:break-word;
     flex-grow:1;
@@ -57,13 +57,15 @@
     align-items:center;
     justify-content:center;
     padding:0 8px;
+    text-align:center;
+    transition:font-size .2s ease;
   }
 
   .pill{
     display:inline-block;
-    padding:4px 12px;
+    padding:6px 16px;
     border-radius:999px;
-    font-size:.9rem;
+    font-size:1rem;
     margin-top:10px;
     color:#333;
     white-space:nowrap;
@@ -76,9 +78,9 @@
   .pill.history{background:var(--cat-history)}
 
   @media (min-width:900px){
-    #fact{font-size:1.5rem;}
-    h1{font-size:1.8rem;}
-    .pill{font-size:1rem;}
+    #fact{font-size:1.8rem;}
+    h1{font-size:2rem;}
+    .pill{font-size:1.1rem;}
   }
 </style>
 </head>
@@ -102,9 +104,6 @@ async function loadList(url){
 function wrap(list,cat,cls){return list.map(t=>({text:t,cat,cls}))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
 
-/* -----------------------------
-   Full content (all lines kept)
------------------------------- */
 const START_FUN = [
   "Honey never spoils—even 3000-year-old Egyptian honey is edible!",
   "Bananas are berries, but strawberries are not.",
@@ -215,9 +214,7 @@ const START_HIST = [
   "2004 — Facebook founded.",
   "2012 — Curiosity rover lands on Mars."
 ];
-
-/* ------------------------------ */
-
+  
 async function start(){
   const fact=document.getElementById("fact");
   const pill=document.getElementById("pill");
@@ -231,6 +228,15 @@ async function start(){
   let items=[...wrap(fun,"Fun Fact","fun"),...wrap(eng,"Engineering Fact","eng"),...wrap(joke,"Joke","joke"),...wrap(trivia,"Trivia","trivia"),...wrap(hist,"This Day in History","history")];
   shuffle(items);
   let i=0;
+
+  function adjustFont(){
+    const el=fact;
+    el.style.fontSize="1.6rem";
+    while(el.scrollHeight>el.clientHeight && parseFloat(el.style.fontSize)>0.8){
+      el.style.fontSize=(parseFloat(el.style.fontSize)-0.05)+"rem";
+    }
+  }
+
   function next(){
     const card=document.getElementById("card");
     card.classList.add("fade");
@@ -239,11 +245,13 @@ async function start(){
       pill.textContent=it.cat;
       pill.className="pill "+it.cls;
       fact.textContent=it.text;
+      adjustFont();
       card.classList.remove("fade");
       i=(i+1)%items.length;
       if(i===0)shuffle(items);
     },500);
   }
+
   next();
   setInterval(next,9000);
 }
